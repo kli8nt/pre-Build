@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+
+  initContainers:
+    - name: builder
+      image: mohamedrafraf/builder:pfa
+      volumeMounts:
+      - name: workdir
+        mountPath: "/workdir"
+      env:
+        - name: TECHNOLOGY
+          value: python
+        - name: Version
+          value: "3.7"
+        - name: REPO_URL
+          value: https://github.com/hmlndrr/feminist.git
+        - name: APP_NAME
+          value: feminist
+        - name: INSTALL_CMD
+          value: "pip install --no-cache-dir -r requirements.txt"
+        - name: RUN_CMD
+          value: "gunicorn --bind 0.0.0.0:80 main:app"
+        - name: STATIC
+          value: "false"
+        - name: PORT
+          value: "80"
+        - name: ENVARS
+          value: "APP=Feminist;AUTHOR=Nie"
+        - name: DEPENDENCIES
+          value: "requirements.txt"
+    - name: init-myservice
+      image: busybox:1.28
+      command: ['sh', '-c', "sleep 1"]
+      volumeMounts:
+      - name: workdir
+        mountPath: "/workdir"
+      
+  containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:latest
+      args:
+        - "--dockerfile=/workdir/feminist/Dockerfile"
+        - "--context=dir:///workdir/feminist"
+        - "--destination=us-central1-docker.pkg.dev/esoteric-might-387308/kli8nt/feminist:latest"
+      volumeMounts:
+        - name: kaniko-secret
+          mountPath: /secret
+        - name: workdir
+          mountPath: "/workdir"
+      env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /secret/kaniko-secret.json
+  restartPolicy: Never
+  volumes:
+    - name: workdir
+      emptyDir: {}
+    - name: kaniko-secret
+      secret:
+        secretName: kaniko-secret
