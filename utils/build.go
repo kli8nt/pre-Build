@@ -37,7 +37,7 @@ func Build(data *Data) error {
 		dockerfile.NextStage()
 		dockerfile.From("nginx").
 			ImageVersion(data.Version).
-			Copy("--from=build /app/"+data.OutputDirectory, "/usr/share/nginx/html").
+			Copy("--from=build /"+data.OutputDirectory, "/usr/share/nginx/html").
 			Cmd("nginx", "-g", "daemon off;").
 			Expose(80)
 	}
