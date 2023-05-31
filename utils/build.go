@@ -31,7 +31,7 @@ func Build(data *Data) error {
 	}
 	if !data.IsStatic {
 		dockerfile.Expose(data.Port).
-			Run(data.RunCommand)
+			Cmd(data.RunCommand)
 	} else {
 		dockerfile.Run(data.BuildCommand)
 		dockerfile.NextStage()
