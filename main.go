@@ -30,7 +30,7 @@ func main() {
 		log.Printf("%+v\n", err)
 	}
 
-	err = utils.ClonePublicRepo(data.RepositoryURL, data.ApplicationName)
+	err = utils.CloneRepo(data.RepositoryURL, data.GithubToken, data.ApplicationName)
 	if err != nil {
 		log.Println(err)
 	}
